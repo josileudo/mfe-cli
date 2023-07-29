@@ -1,0 +1,20 @@
+{
+  "name": "angular-mfe-cli",
+  "version": "0.0.0",
+  "description": "This goal of project is create a nem MFE starting using a template pre-defined",
+  "main": "index.js",
+  "bin": {
+    "ng-create-new-mfe": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "Hello word"
+  },
+  "keywords": [
+    "mfe",
+    "cli",
+    "angular",
+    "customElements"
+  ],
+  "author": "josileudo_rodrigues",
+  "license": "MIT"
+}
