@@ -24,20 +24,17 @@ const replaceAllOccurrences = (obj, searchValue, replaceValue) => {
   }
 }
 
-const replaceProjectNameInAngularJson = (basePath, projectName) => {
-  const angularJsonPath = path.join(basePath, 'angular.json');
+const replaceProjectName = (basePath, fileName, projectName) => {
+  const fileJsonPath = path.join(basePath, fileName);
 
-  if(fs.existsSync(angularJsonPath)) {
-    const angularJsonContent = fs.readFileSync(angularJsonPath, 'utf-8');
+  if(fs.existsSync(fileJsonPath)) {
+    const angularJsonContent = fs.readFileSync(fileJsonPath, 'utf-8');
     const angularJson = JSON.parse(angularJsonContent);
-
-    angularJson.projects[projectName] = angularJson.projects['create-mfe-app'];
-    delete angularJson.projects['create-mfe-app'];
 
     const oldName = 'create-mfe-app'
     replaceAllOccurrences(angularJson, oldName, projectName);
 
-    fs.writeFileSync(angularJsonPath, JSON.stringify(angularJson, null, 2), 'utf-8');
+    fs.writeFileSync(fileJsonPath, JSON.stringify(angularJson, null, 2), 'utf-8');
   }
 }
 
@@ -55,7 +52,10 @@ if(!installedDeps) process.exit(-1);
 
 const projectName = repoName;
 const templatePath = path.join(process.cwd(), repoName);
-replaceProjectNameInAngularJson(templatePath, projectName);
+
+// Replace name in angular.json file
+replaceProjectName(templatePath, 'angular.json', projectName);
+replaceProjectName(templatePath, 'package.json', projectName);
 
 console.log("Congratulations! You are ready. Follow the following commands to start");
 console.log(`cd ${repoName} && npm start`);
