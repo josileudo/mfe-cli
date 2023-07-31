@@ -26,17 +26,22 @@ const replaceAllOccurrences = (obj, searchValue, replaceValue) => {
 }
 
 // Will be receive a name to replace
-const replaceProjectName = (basePath, fileName, projectName) => {
+const updateJsonFile = (basePath, fileName, projectName) => {
   const filePath = path.join(basePath, fileName);
 
   if(fs.existsSync(filePath)) {
-    const angularJsonContent = fs.readFileSync(filePath, 'utf-8');
-    const angularJson = JSON.parse(angularJsonContent);
+    const fileJsonContent = fs.readFileSync(filePath, 'utf-8');
+    const fileJson = JSON.parse(fileJsonContent);
+
+    if(fileJson.projects) {
+      fileJson.projects[projectName] = fileJson.projects['create-mfe-app'];
+      delete fileJson.projects['create-mfe-app'];
+    }
+
     const oldName = 'create-mfe-app'
+    replaceAllOccurrences(fileJson, oldName, projectName);
 
-    replaceAllOccurrences(angularJson, oldName, projectName);
-
-    fs.writeFileSync(filePath, JSON.stringify(angularJson, null, 2), 'utf-8');
+    fs.writeFileSync(filePath, JSON.stringify(fileJson, null, 2), 'utf-8');
   }
 }
 
@@ -66,8 +71,8 @@ const projectName = repoName;
 const templatePath = path.join(process.cwd(), repoName);
 
 // Replace name in JSON files
-replaceProjectName(templatePath, 'angular.json', projectName);
-replaceProjectName(templatePath, 'package.json', projectName);
+updateJsonFile(templatePath, 'angular.json', projectName);
+updateJsonFile(templatePath, 'package.json', projectName);
 
 // Replace name in TS files
 replaceTsTitleName(templatePath, 'src/app/app.component.ts', projectName);
