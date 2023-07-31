@@ -14,6 +14,7 @@ const runCommand = command => {
   return true;
 }
 
+// Check all structure to change name project.
 const replaceAllOccurrences = (obj, searchValue, replaceValue) => {
   for(const key in obj) {
     if(typeof obj[key] === 'object') {
@@ -24,18 +25,29 @@ const replaceAllOccurrences = (obj, searchValue, replaceValue) => {
   }
 }
 
+// Will be receive a name to replace
 const replaceProjectName = (basePath, fileName, projectName) => {
-  const fileJsonPath = path.join(basePath, fileName);
+  const filePath = path.join(basePath, fileName);
 
-  if(fs.existsSync(fileJsonPath)) {
-    const angularJsonContent = fs.readFileSync(fileJsonPath, 'utf-8');
+  if(fs.existsSync(filePath)) {
+    const angularJsonContent = fs.readFileSync(filePath, 'utf-8');
     const angularJson = JSON.parse(angularJsonContent);
-
     const oldName = 'create-mfe-app'
+
     replaceAllOccurrences(angularJson, oldName, projectName);
 
-    fs.writeFileSync(fileJsonPath, JSON.stringify(angularJson, null, 2), 'utf-8');
+    fs.writeFileSync(filePath, JSON.stringify(angularJson, null, 2), 'utf-8');
   }
+}
+
+const replaceTsTitleName = (basePath, fileName ,projectName) => {
+  const filePath = path.join(basePath, fileName);
+  let fileContent = fs.readFileSync(filePath, 'utf-8');
+  
+  const oldName = 'create-mfe-app';
+  fileContent = fileContent.replace(new RegExp(oldName, 'g'), projectName);
+
+  fs.writeFileSync(filePath, fileContent, 'utf-8');
 }
 
 const repoName = process.argv[2];
@@ -53,9 +65,14 @@ if(!installedDeps) process.exit(-1);
 const projectName = repoName;
 const templatePath = path.join(process.cwd(), repoName);
 
-// Replace name in angular.json file
+// Replace name in JSON files
 replaceProjectName(templatePath, 'angular.json', projectName);
 replaceProjectName(templatePath, 'package.json', projectName);
 
+// Replace name in TS files
+replaceTsTitleName(templatePath, 'src/app/app.component.ts', projectName);
+replaceTsTitleName(templatePath, 'src/app/app.component.spec.ts', projectName);
+
+// Work finish
 console.log("Congratulations! You are ready. Follow the following commands to start");
 console.log(`cd ${repoName} && npm start`);
