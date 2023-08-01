@@ -3,6 +3,16 @@
 const {execSync} = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const ex = require('fs-extra');
+
+const removeFilesRequired = async (src, dest) => {
+  try {
+    await ex.remove(`${src}/${dest}`)
+    console.log('success!')
+  } catch (err) {
+    console.error(err)
+  }
+}
 
 const runCommand = command => {
   try {
@@ -11,6 +21,7 @@ const runCommand = command => {
     console.error(`Failed to execute ${command}`, e);
     return false;
   }
+
   return true;
 }
 
@@ -45,7 +56,7 @@ const updateJsonFile = (basePath, fileName, projectName) => {
   }
 }
 
-const replaceTsTitleName = (basePath, fileName ,projectName) => {
+const updateNameInFiles = (basePath, fileName, projectName) => {
   const filePath = path.join(basePath, fileName);
   let fileContent = fs.readFileSync(filePath, 'utf-8');
   
@@ -57,15 +68,11 @@ const replaceTsTitleName = (basePath, fileName ,projectName) => {
 
 const repoName = process.argv[2];
 const gitCheckoutCommand = `git clone --depth 1 https://github.com/josileudo/create-mfe-app ${repoName}`;
-const installDepsCommand = `cd ${repoName} && npm install`;
+const installDepsCommand = `cd ${repoName} && npm i -f`;
 
 console.log(`Cloning the repository with name ${repoName}`);
 const checkedOut = runCommand(gitCheckoutCommand);
 if(!checkedOut) process.exit(-1);
-
-console.log(`Installing dependencies for the ${repoName}`);
-const installedDeps = runCommand(installDepsCommand);
-if(!installedDeps) process.exit(-1);
 
 const projectName = repoName;
 const templatePath = path.join(process.cwd(), repoName);
@@ -75,9 +82,20 @@ updateJsonFile(templatePath, 'angular.json', projectName);
 updateJsonFile(templatePath, 'package.json', projectName);
 
 // Replace name in TS files
-replaceTsTitleName(templatePath, 'src/app/app.component.ts', projectName);
-replaceTsTitleName(templatePath, 'src/app/app.component.spec.ts', projectName);
+updateNameInFiles(templatePath, 'src/app/app.component.ts', projectName);
+updateNameInFiles(templatePath, 'src/app/app.component.spec.ts', projectName);
+updateNameInFiles(templatePath, 'src/app/app.module.ts', projectName);
+
+// Replace README.md name
+updateNameInFiles(templatePath, 'README.md', projectName);
+
+// Remove .git file to initializing a new project
+removeFilesRequired(projectName, '.git');
+
+console.log(`Installing dependencies for the ${repoName}`);
+const installedDeps = runCommand(installDepsCommand);
+if(!installedDeps) process.exit(-1);
 
 // Work finish
-console.log("Congratulations! You are ready. Follow the following commands to start");
-console.log(`cd ${repoName} && npm start`);
+console.info("Congratulations! You are ready. Follow the following commands to start");
+console.info(`cd ${repoName} && npm start`);
