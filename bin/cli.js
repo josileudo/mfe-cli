@@ -8,7 +8,6 @@ const ex = require('fs-extra');
 const removeFilesRequired = async (src, dest) => {
   try {
     await ex.remove(`${src}/${dest}`)
-    console.log('success!')
   } catch (err) {
     console.error(err)
   }
@@ -26,35 +25,35 @@ const runCommand = command => {
 }
 
 // Check all structure to change name project.
-const replaceAllOccurrences = (obj, searchValue, replaceValue) => {
-  for(const key in obj) {
-    if(typeof obj[key] === 'object') {
-      replaceAllOccurrences(obj[key], searchValue, replaceValue);
-    } else if (typeof obj[key] === 'string') {
-      obj[key] = obj[key].replace(new RegExp(searchValue, 'g'), replaceValue);
-    }
-  }
-}
+// const replaceAllOccurrences = (obj, searchValue, replaceValue) => {
+//   for(const key in obj) {
+//     if(typeof obj[key] === 'object') {
+//       replaceAllOccurrences(obj[key], searchValue, replaceValue);
+//     } else if (typeof obj[key] === 'string') {
+//       obj[key] = obj[key].replace(new RegExp(searchValue, 'g'), replaceValue);
+//     }
+//   }
+// }
 
 // Will be receive a name to replace
-const updateJsonFile = (basePath, fileName, projectName) => {
-  const filePath = path.join(basePath, fileName);
+// const updateJsonFile = (basePath, fileName, projectName) => {
+//   const filePath = path.join(basePath, fileName);
 
-  if(fs.existsSync(filePath)) {
-    const fileJsonContent = fs.readFileSync(filePath, 'utf-8');
-    const fileJson = JSON.parse(fileJsonContent);
+//   if(fs.existsSync(filePath)) {
+//     const fileJsonContent = fs.readFileSync(filePath, 'utf-8');
+//     const fileJson = JSON.parse(fileJsonContent);
 
-    if(fileJson.projects) {
-      fileJson.projects[projectName] = fileJson.projects['create-mfe-app'];
-      delete fileJson.projects['create-mfe-app'];
-    }
+//     if(fileJson.projects) {
+//       fileJson.projects[projectName] = fileJson.projects['create-mfe-app'];
+//       delete fileJson.projects['create-mfe-app'];
+//     }
 
-    const oldName = 'create-mfe-app'
-    replaceAllOccurrences(fileJson, oldName, projectName);
+//     const oldName = 'create-mfe-app'
+//     replaceAllOccurrences(fileJson, oldName, projectName);
 
-    fs.writeFileSync(filePath, JSON.stringify(fileJson, null, 2), 'utf-8');
-  }
-}
+//     fs.writeFileSync(filePath, JSON.stringify(fileJson, null, 2), 'utf-8');
+//   }
+// }
 
 const updateNameInFiles = (basePath, fileName, projectName) => {
   const filePath = path.join(basePath, fileName);
@@ -76,15 +75,28 @@ if(!checkedOut) process.exit(-1);
 
 const projectName = repoName;
 const templatePath = path.join(process.cwd(), repoName);
-
+const arrayFiles = [
+  'src/app/app.component.ts', 
+  'src/app/app.component.spec.ts', 
+  'src/app/app.module.ts', 
+  'package.json', 
+  'angular.json'
+]
 // Replace name in JSON files
-updateJsonFile(templatePath, 'angular.json', projectName);
-updateJsonFile(templatePath, 'package.json', projectName);
+// updateJsonFile(templatePath, 'angular.json', projectName);
+// updateJsonFile(templatePath, 'package.json', projectName);
 
 // Replace name in TS files
-updateNameInFiles(templatePath, 'src/app/app.component.ts', projectName);
-updateNameInFiles(templatePath, 'src/app/app.component.spec.ts', projectName);
-updateNameInFiles(templatePath, 'src/app/app.module.ts', projectName);
+
+for(const file of arrayFiles) {
+  updateNameInFiles(templatePath, file, projectName);
+}
+
+// updateNameInFiles(templatePath, 'src/app/app.component.ts', projectName);
+// updateNameInFiles(templatePath, 'src/app/app.component.spec.ts', projectName);
+// updateNameInFiles(templatePath, 'src/app/app.module.ts', projectName);
+// updateNameInFiles(templatePath, 'package.json', projectName);
+// updateNameInFiles(templatePath, 'angular.json', projectName);
 
 // Replace README.md name
 updateNameInFiles(templatePath, 'README.md', projectName);
@@ -97,5 +109,5 @@ const installedDeps = runCommand(installDepsCommand);
 if(!installedDeps) process.exit(-1);
 
 // Work finish
-console.info("Congratulations! You are ready. Follow the following commands to start");
-console.info(`cd ${repoName} && npm start`);
+console.warn("Congratulations! You are ready. Follow the following commands to start");
+console.warn(`cd ${repoName} && npm start`);
