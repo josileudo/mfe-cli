@@ -3,7 +3,25 @@
 const {execSync} = require('child_process');
 const fs = require('fs');
 const path = require('path');
+
 const ex = require('fs-extra');
+
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
+const argv = yargs(hideBin(process.argv)).argv;
+
+// TODO
+// Nossa ideia é setar o tipo de estilo que o cliente deseja
+// por exemplo: scss, css, sass, less
+
+// Caso a flag setada não contenha nenhum dos valores, retornar um erro
+
+
+// if(argv.style !== 'scss') {
+//   console.log('Está usando outro estilo');
+// }
+
+
 
 const removeFilesRequired = async (src, dest) => {
   try {
@@ -55,11 +73,10 @@ const runCommand = command => {
 //   }
 // }
 
-const updateNameInFiles = (basePath, fileName, projectName) => {
+const updateNameInFiles = (basePath, fileName, oldName, projectName) => {
   const filePath = path.join(basePath, fileName);
   let fileContent = fs.readFileSync(filePath, 'utf-8');
   
-  const oldName = 'create-mfe-app';
   fileContent = fileContent.replace(new RegExp(oldName, 'g'), projectName);
 
   fs.writeFileSync(filePath, fileContent, 'utf-8');
@@ -67,7 +84,8 @@ const updateNameInFiles = (basePath, fileName, projectName) => {
 
 const repoName = process.argv[2];
 const gitCheckoutCommand = `git clone --depth 1 https://github.com/josileudo/create-mfe-app ${repoName}`;
-const installDepsCommand = `cd ${repoName} && npm i -f`;
+// const installAfterCommand = `cd ${repoName} && npm i -f`;
+const installAfterCommand = `cd ${repoName}`;
 
 console.log(`Cloning the repository with name ${repoName}`);
 const checkedOut = runCommand(gitCheckoutCommand);
@@ -75,37 +93,48 @@ if(!checkedOut) process.exit(-1);
 
 const projectName = repoName;
 const templatePath = path.join(process.cwd(), repoName);
-const arrayFiles = [
-  'src/app/app.component.ts', 
-  'src/app/app.component.spec.ts', 
-  'src/app/app.module.ts', 
-  'package.json', 
-  'angular.json'
-]
-// Replace name in JSON files
-// updateJsonFile(templatePath, 'angular.json', projectName);
-// updateJsonFile(templatePath, 'package.json', projectName);
+const oldName = 'create-mfe-app';
 
-// Replace name in TS files
+// Replace *TS files
+updateNameInFiles(templatePath, 'src/app/app.component.ts', oldName, projectName);
+updateNameInFiles(templatePath, 'src/app/app.component.spec.ts', oldName, projectName);
+updateNameInFiles(templatePath, 'src/app/app.module.ts', oldName, projectName);
 
-for(const file of arrayFiles) {
-  updateNameInFiles(templatePath, file, projectName);
+// Replace *Json files
+updateNameInFiles(templatePath, 'package.json', oldName, projectName);
+updateNameInFiles(templatePath, 'angular.json', oldName, projectName);
+
+// Choice style
+const choiceStyleExtension = () => {
+  const extensions = ['scss', 'css', 'sass', 'less'];
+
+  let res = extensions.filter((value) => value === argv.style);
+  
+  res.map(value => {
+    if(value)  {
+      const oldExt = path.join(templatePath, 'src', 'styles.scss');
+      const newExt = path.join(templatePath, 'src', `styles.${value}`);
+      
+      updateNameInFiles(templatePath, 'angular.json', 'scss', value);
+
+      fs.rename(oldExt, newExt, (err) => {
+        if(err) console.error('Extensions error!!!!');
+      })
+    }
+    return;
+  })
 }
 
-// updateNameInFiles(templatePath, 'src/app/app.component.ts', projectName);
-// updateNameInFiles(templatePath, 'src/app/app.component.spec.ts', projectName);
-// updateNameInFiles(templatePath, 'src/app/app.module.ts', projectName);
-// updateNameInFiles(templatePath, 'package.json', projectName);
-// updateNameInFiles(templatePath, 'angular.json', projectName);
+choiceStyleExtension();
 
-// Replace README.md name
-updateNameInFiles(templatePath, 'README.md', projectName);
+// Replace *README.md name
+updateNameInFiles(templatePath, 'README.md', oldName, projectName);
 
 // Remove .git file to initializing a new project
 removeFilesRequired(projectName, '.git');
 
 console.log(`Installing dependencies for the ${repoName}`);
-const installedDeps = runCommand(installDepsCommand);
+const installedDeps = runCommand(installAfterCommand);
 if(!installedDeps) process.exit(-1);
 
 // Work finish
