@@ -84,8 +84,7 @@ const updateNameInFiles = (basePath, fileName, oldName, projectName) => {
 
 const repoName = process.argv[2];
 const gitCheckoutCommand = `git clone --depth 1 https://github.com/josileudo/create-mfe-app ${repoName}`;
-// const installAfterCommand = `cd ${repoName} && npm i -f`;
-const installAfterCommand = `cd ${repoName}`;
+const installAfterCommand = `cd ${repoName} && npm i -f`;
 
 console.log(`Cloning the repository with name ${repoName}`);
 const checkedOut = runCommand(gitCheckoutCommand);
@@ -108,14 +107,14 @@ updateNameInFiles(templatePath, 'angular.json', oldName, projectName);
 const choiceStyleExtension = () => {
   const extensions = ['scss', 'css', 'sass', 'less'];
 
-  let res = extensions.filter((value) => value === argv.style);
+  let res = extensions.filter((extension) => extension === argv.style);
   
-  res.map(value => {
-    if(value)  {
+  res.map(type => {
+    if(type)  {
       const oldExt = path.join(templatePath, 'src', 'styles.scss');
-      const newExt = path.join(templatePath, 'src', `styles.${value}`);
-      
-      updateNameInFiles(templatePath, 'angular.json', 'scss', value);
+      const newExt = path.join(templatePath, 'src', `styles.${type}`);
+
+      updateNameInFiles(templatePath, 'angular.json', 'scss', type);
 
       fs.rename(oldExt, newExt, (err) => {
         if(err) console.error('Extensions error!!!!');
