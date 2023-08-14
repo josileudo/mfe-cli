@@ -10,19 +10,6 @@ const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const argv = yargs(hideBin(process.argv)).argv;
 
-// TODO
-// Nossa ideia é setar o tipo de estilo que o cliente deseja
-// por exemplo: scss, css, sass, less
-
-// Caso a flag setada não contenha nenhum dos valores, retornar um erro
-
-
-// if(argv.style !== 'scss') {
-//   console.log('Está usando outro estilo');
-// }
-
-
-
 const removeFilesRequired = async (src, dest) => {
   try {
     await ex.remove(`${src}/${dest}`)
@@ -83,7 +70,7 @@ const updateNameInFiles = (basePath, fileName, oldName, projectName) => {
 }
 
 const repoName = process.argv[2];
-const gitCheckoutCommand = `git clone --depth 1 https://github.com/josileudo/create-mfe-app ${repoName}`;
+const gitCheckoutCommand = `git clone --depth 1 --branch 15.0.x https://github.com/josileudo/create-mfe-app ${repoName}`;
 const installAfterCommand = `cd ${repoName} && npm i -f`;
 
 console.log(`Cloning the repository with name ${repoName}`);
@@ -102,6 +89,9 @@ updateNameInFiles(templatePath, 'src/app/app.module.ts', oldName, projectName);
 // Replace *Json files
 updateNameInFiles(templatePath, 'package.json', oldName, projectName);
 updateNameInFiles(templatePath, 'angular.json', oldName, projectName);
+
+// get versions
+
 
 // Choice style
 const choiceStyleExtension = () => {
