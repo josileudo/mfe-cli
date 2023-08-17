@@ -18,7 +18,11 @@
   "author": "josileudo_rodrigues",
   "license": "MIT",
   "dependencies": {
+    "cli-progress": "^3.12.0",
+    "figlet": "^1.6.0",
     "fs-extra": "^11.1.1",
+    "inquirer": "^9.2.10",
+    "shelljs": "^0.8.5",
     "yargs": "^17.7.2"
   }
 }
