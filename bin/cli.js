@@ -1,20 +1,17 @@
 #!/usr/bin/env node
+'use strict'
 
 const {execSync} = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const Ace = require('@adonisjs/ace')
+
 //const { createPromptModule } = require('inquirer');
 const ex = require('fs-extra');
-const { SingleBar, Presets } = require('cli-progress');
-
-
-let progress;
 
 // const yargs = require('yargs/yargs');
 // const { hideBin } = require('yargs/helpers');
 // const argv = yargs(hideBin(process.argv)).argv;
-
-// ASK questions
 
 const removeFilesRequired = async (src, dest) => {
   try {
@@ -35,14 +32,6 @@ const runCommand = command => {
   return true;
 }
 
-const progressConfig = (message) => {  
-  progress = new SingleBar({
-    format: `${message}: [{bar}] {percentage}% | ETA: {eta}s | {value}/{total} Steps`,
-    barCompleteChar: '\u2588',
-    barIncompleteChar: '\u2591',
-    hideCursor: true
-  }, Presets.shades_classic);
-}
 
 const main = async() => {
   try {
@@ -69,22 +58,17 @@ const main = async() => {
     
     // console.warn()
 
-    progressConfig(`${'\x1b[33m'} Creating ${repoName} project`)
+    console.log(`${'\x1b[33m'} Creating ${repoName} project`)
 
     // start the progress bar with a total value of 200 and start value of 0
-    progress.start(100, 0);
-
-    // update the current value in your application..
-    progress.update(20);
-
+  
+    // update the curren
     // stop the progress bar
           
     // const checkedOut = runCommand(gitCheckoutCommand);
     // if(!checkedOut) process.exit(-1);
     execSync(gitCheckoutCommand, { stdio: ['inherit', 'ignore', 'ignore' ]})
     
-    progress.update(80);
-
     const projectName = repoName;
     const templatePath = path.join(process.cwd(), repoName);
     const oldName = 'create-mfe-app';
@@ -138,22 +122,13 @@ const main = async() => {
     // Remove .git file to initializing a new project
     removeFilesRequired(projectName, '.git');
 
-    progress.update(100);
-
-    progress.stop();
-
-    progressConfig(`${'\x1b[33m'} Installing dependencies for the ${'\x1b[32m', repoName} project`)
+    console.log(`${'\x1b[33m'} Installing dependencies for the ${'\x1b[32m', repoName} project`)
     
-    progress.start(100, 0);
-
     const installedDeps = runCommand(installAfterCommand);
     
     if(!installedDeps) process.exit(-1);
-    progress.update(80);
     
     // Work finish
-    progress.update(100);
-    progress.stop();
 
     console.log(`${'\x1b[32m'} Congratulations! You are ready. Follow the following commands to start`);
     console.warn(`${'\x1b[34m'} cd ${repoName} && npm start`);  
@@ -164,4 +139,12 @@ const main = async() => {
   }
 }
 
-main();
+
+// add commands as ES2015 classes
+Ace.addCommand(require('../commands/run-tasks'))
+Ace.addCommand(require('../commands/run-tasks-parallel'))
+
+// Boot ace to execute commands
+Ace.wireUpWithCommander()
+Ace.invoke()
+// main();
