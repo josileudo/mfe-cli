@@ -6,6 +6,7 @@ const Listr = require('listr')
 
 const templateClone = require('./create-template.js')
 const runCommand = require('./install-files.js');
+const removeFilesRequired = require('./remove-files.js')
 const { updateNameInFiles, choiceStyleExtension} = require('./name-replaced');
 
 // const gitCheckoutCommand = `git clone --depth 1 --branch 15.0.x https://github.com/josileudo/create-mfe-app ${'repoName'}`;
@@ -81,6 +82,11 @@ class RunTasks extends Command {
         title: 'Replace extension style',
         skip: () => false,
         task: () => choiceStyleExtension(answers.style, answers.projectName)
+      },
+      {
+        title: 'Remove .git file',
+        skip: () => false,
+        task: () => removeFilesRequired(answers.projectName, '.git')
       },
       {
         title: `Installing dependencies for the ${answers.projectName} project`,

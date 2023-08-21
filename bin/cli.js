@@ -84,27 +84,27 @@ const main = async() => {
     // get versions    
     
     // Choice style
-    const choiceStyleExtension = () => {
-      const extensions = ['scss', 'css', 'sass', 'less'];
+    // const choiceStyleExtension = () => {
+    //   const extensions = ['scss', 'css', 'sass', 'less'];
     
-      let res = extensions.filter((extension) => extension === answers.style);
+    //   let res = extensions.filter((extension) => extension === answers.style);
       
-      res.map(type => {
-        if(type)  {
-          const oldExt = path.join(templatePath, 'src', 'styles.scss');
-          const newExt = path.join(templatePath, 'src', `styles.${type}`);
+    //   res.map(type => {
+    //     if(type)  {
+    //       const oldExt = path.join(templatePath, 'src', 'styles.scss');
+    //       const newExt = path.join(templatePath, 'src', `styles.${type}`);
     
-          updateNameInFiles(templatePath, 'angular.json', 'scss', type);
+    //       updateNameInFiles(templatePath, 'angular.json', 'scss', type);
     
-          fs.rename(oldExt, newExt, (err) => {
-            if(err) console.error(`${'x1b[31m'} Extensions error!!!!`);
-          })
-        }
-        return;
-      })
-    }
+    //       fs.rename(oldExt, newExt, (err) => {
+    //         if(err) console.error(`${'x1b[31m'} Extensions error!!!!`);
+    //       })
+    //     }
+    //     return;
+    //   })
+    // }
     
-    choiceStyleExtension();
+    // choiceStyleExtension();
     
     // Replace *README.md name
     // updateNameInFiles(templatePath, 'README.md', oldName, projectName);

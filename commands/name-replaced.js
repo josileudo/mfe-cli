@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-const oldName = 'create-mfe-app';
 const files = [
   'src/app/app.component.ts',
   'src/app/app.component.spec.ts',
@@ -13,6 +12,7 @@ const files = [
 const extensions = ['scss', 'css', 'sass', 'less'];
 
 const updateNameInFiles = (projectName) => {
+  const oldName = 'create-mfe-app';
   const templatePath = path.join(process.cwd(), projectName);
 
   for(const file of files) {    
@@ -26,10 +26,11 @@ const choiceStyleExtension = (style, projectName) => {
 
   res.map(type => {
     if(type)  {
-      const oldExt = path.join(templatePath, 'src', 'styles.scss');
+      const defExt = 'scss'
+      const oldExt = path.join(templatePath, 'src', `styles.${defExt}`);
       const newExt = path.join(templatePath, 'src', `styles.${type}`);
 
-      replaceRequired(templatePath, 'angular.json', 'scss', type)
+      replaceRequired(templatePath, 'angular.json', defExt, type)
       
       fs.rename(oldExt, newExt, (err) => {
         if(err) console.error(`${'x1b[31m'} Extensions error!!!!`);
