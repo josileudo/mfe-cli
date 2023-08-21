@@ -21,16 +21,16 @@ const removeFilesRequired = async (src, dest) => {
   }
 }
 
-const runCommand = command => {
-  try {
-    execSync(`${command}`, {stdio: ['inherit', 'ignore', 'ignore']});
-  } catch (e) {
-    console.error(`Failed to execute ${command}`, e);
-    return false;
-  }
+// const runCommand = command => {
+//   try {
+//     execSync(`${command}`, {stdio: ['inherit', 'ignore', 'ignore']});
+//   } catch (e) {
+//     console.error(`Failed to execute ${command}`, e);
+//     return false;
+//   }
 
-  return true;
-}
+//   return true;
+// }
 
 
 const main = async() => {
@@ -53,43 +53,33 @@ const main = async() => {
     ])
 
     const repoName = answers.projectName;
-    const gitCheckoutCommand = `git clone --depth 1 --branch 15.0.x https://github.com/josileudo/create-mfe-app ${repoName}`;
     const installAfterCommand = `cd ${repoName} && npm i -f`;
     
     // console.warn()
 
     console.log(`${'\x1b[33m'} Creating ${repoName} project`)
 
-    // start the progress bar with a total value of 200 and start value of 0
-  
-    // update the curren
-    // stop the progress bar
-          
-    // const checkedOut = runCommand(gitCheckoutCommand);
-    // if(!checkedOut) process.exit(-1);
-    execSync(gitCheckoutCommand, { stdio: ['inherit', 'ignore', 'ignore' ]})
-    
     const projectName = repoName;
     const templatePath = path.join(process.cwd(), repoName);
     const oldName = 'create-mfe-app';
 
-    const updateNameInFiles = (basePath, fileName, oldName, projectName) => {
-      const filePath = path.join(basePath, fileName);
-      let fileContent = fs.readFileSync(filePath, 'utf-8');
+    // const updateNameInFiles = (basePath, fileName, oldName, projectName) => {
+    //   const filePath = path.join(basePath, fileName);
+    //   let fileContent = fs.readFileSync(filePath, 'utf-8');
       
-      fileContent = fileContent.replace(new RegExp(oldName, 'g'), projectName);
+    //   fileContent = fileContent.replace(new RegExp(oldName, 'g'), projectName);
     
-      fs.writeFileSync(filePath, fileContent, 'utf-8');
-    }
+    //   fs.writeFileSync(filePath, fileContent, 'utf-8');
+    // }
 
     // Replace *TS files
-    updateNameInFiles(templatePath, 'src/app/app.component.ts', oldName, projectName);
-    updateNameInFiles(templatePath, 'src/app/app.component.spec.ts', oldName, projectName);
-    updateNameInFiles(templatePath, 'src/app/app.module.ts', oldName, projectName);
+    // updateNameInFiles(templatePath, 'src/app/app.component.ts', oldName, projectName);
+    // updateNameInFiles(templatePath, 'src/app/app.component.spec.ts', oldName, projectName);
+    // updateNameInFiles(templatePath, 'src/app/app.module.ts', oldName, projectName);
     
-    // Replace *Json files
-    updateNameInFiles(templatePath, 'package.json', oldName, projectName);
-    updateNameInFiles(templatePath, 'angular.json', oldName, projectName);
+    // // Replace *Json files
+    // updateNameInFiles(templatePath, 'package.json', oldName, projectName);
+    // updateNameInFiles(templatePath, 'angular.json', oldName, projectName);
     
     // get versions    
     
@@ -117,7 +107,7 @@ const main = async() => {
     choiceStyleExtension();
     
     // Replace *README.md name
-    updateNameInFiles(templatePath, 'README.md', oldName, projectName);
+    // updateNameInFiles(templatePath, 'README.md', oldName, projectName);
     
     // Remove .git file to initializing a new project
     removeFilesRequired(projectName, '.git');
