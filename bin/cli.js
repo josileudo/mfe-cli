@@ -110,18 +110,18 @@ const main = async() => {
     // updateNameInFiles(templatePath, 'README.md', oldName, projectName);
     
     // Remove .git file to initializing a new project
-    removeFilesRequired(projectName, '.git');
+    // removeFilesRequired(projectName, '.git');
 
-    console.log(`${'\x1b[33m'} Installing dependencies for the ${'\x1b[32m', repoName} project`)
+    // console.log(`${'\x1b[33m'} Installing dependencies for the ${'\x1b[32m', repoName} project`)
     
-    const installedDeps = runCommand(installAfterCommand);
+    // const installedDeps = runCommand(installAfterCommand);
     
-    if(!installedDeps) process.exit(-1);
+    // if(!installedDeps) process.exit(-1);
     
-    // Work finish
+    // // Work finish
 
-    console.log(`${'\x1b[32m'} Congratulations! You are ready. Follow the following commands to start`);
-    console.warn(`${'\x1b[34m'} cd ${repoName} && npm start`);  
+    // console.log(`${'\x1b[32m'} Congratulations! You are ready. Follow the following commands to start`);
+    // console.warn(`${'\x1b[34m'} cd ${repoName} && npm start`);  
 
   } catch(err) {
     console.error(`${'\x1b[31m'}An error ocurred: `, err)

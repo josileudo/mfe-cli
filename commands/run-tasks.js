@@ -4,13 +4,14 @@
 const { Command } = require('@adonisjs/ace')
 const Listr = require('listr')
 
-const templateClone = require('./create-template.js')
-const runCommand = require('./install-files.js');
+const runCommand = require('./run-command.js');
 const removeFilesRequired = require('./remove-files.js')
 const { updateNameInFiles, choiceStyleExtension} = require('./name-replaced');
 
 // const gitCheckoutCommand = `git clone --depth 1 --branch 15.0.x https://github.com/josileudo/create-mfe-app ${'repoName'}`;
 let answers;
+const gitCheckoutCommand = `git clone --depth 1 --branch 15.0.x https://github.com/josileudo/create-mfe-app`;
+
 class RunTasks extends Command { 
   /**
    * The method signature describes the comannd, arguments and flags/aliases
@@ -41,9 +42,11 @@ class RunTasks extends Command {
 
   async handle(args, { skipFuel, skipPassengers, captain }) {
     // deployment task list
+
     try {
       const { createPromptModule } = await import('inquirer'); 
       const prompt = createPromptModule();
+
       answers = await prompt([
         {
           type: 'input',
@@ -61,37 +64,48 @@ class RunTasks extends Command {
       console.error(`${'\x1b[31m'}An error ocurred: `, err)
       process.exit(1);
     }
-  
 
     const tasks = new Listr([
       {
-        title: `Creating ${answers.projectName} project`,
+        title: `Configuring ${this.chalk.bold.green(answers.projectName)} project`,
         skip: () => {
           // returning a truthy value for "skip" will actually skip the task
           // a falsy value will not skip the task execution
           return skipFuel ? 'Skip fueling.' : false
         },
-        task: () => templateClone(answers.projectName)
+        task: () => new Listr([
+          {
+            title: 'Creating ...',
+            skip: () => false, 
+            task: () => runCommand(`${gitCheckoutCommand} ${answers.projectName}`)
+          },
+          {
+            title: 'Replace files name',
+            skip: () => false,
+            task: () => updateNameInFiles(answers.projectName)
+          },
+          {
+            title: 'Replace extension style',
+            skip: () => false,
+            task: () => choiceStyleExtension(answers.style, answers.projectName)
+          },
+          {
+            title: 'Remove .git file',
+            skip: () => false,
+            task: () => removeFilesRequired(answers.projectName, '.git')
+          },
+          {
+            title: 'Preparing ...',
+            skip: () => false,
+            task: () =>  this.waitASecond()
+          },
+        ])
+        
       },
       {
-        title: 'Replace files name',
-        skip: () => false,
-        task: () => updateNameInFiles(answers.projectName)
-      },
-      {
-        title: 'Replace extension style',
-        skip: () => false,
-        task: () => choiceStyleExtension(answers.style, answers.projectName)
-      },
-      {
-        title: 'Remove .git file',
-        skip: () => false,
-        task: () => removeFilesRequired(answers.projectName, '.git')
-      },
-      {
-        title: `Installing dependencies for the ${answers.projectName} project`,
+        title: `Installing dependencies for the ${this.chalk.bold.green(answers.projectName)} project`,
         skip: skipPassengers,
-        task: () => runCommand(`cd ${answers.projectName} `)
+        task: () => runCommand(`cd ${answers.projectName} && npm i -f`)
       },
     ])
     
@@ -110,7 +124,7 @@ class RunTasks extends Command {
   }
 
   waitASecond() {
-    return new Promise(resolve => setTimeout(resolve, 3000))
+    return new Promise(resolve => setTimeout(resolve, 900))
   } 
 }
 
