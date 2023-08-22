@@ -12,16 +12,16 @@ const { updateNameInFiles, choiceStyleExtension} = require('./name-replaced');
 let answers;
 const gitCheckoutCommand = `git clone --depth 1 --branch 15.0.x https://github.com/josileudo/create-mfe-app`;
 
-class RunTasks extends Command { 
+class CreateMfe extends Command { 
   /**
-   * The method signature describes the comannd, arguments and flags/aliases
+   * The method signature describes the command, arguments and flags/aliases
    * The words flags and aliases mean the same thing in this context 😃
    */
   static get signature() {
-    return `run-tasks
-    { -f, --skip-fuel: Skip fueling the rocket }
-    { -p, --skip-passengers: Skip boarding passengers }
-    { -c, --captain=@value: Specify the captain's name }`
+    return `create-mfe
+    { -s, --style-choose: Choice your style extension }
+    { -i, --install-packages: Install packages after create mfe project}
+    `
   }
 
   /**
@@ -29,9 +29,9 @@ class RunTasks extends Command {
    * about the command
    */
   static get description() {
-    return 'Run a list of tasks.'
+    return 'Run to create an mfe create.'
   }
-
+  
   /**
    * Handle the command
    *
@@ -40,26 +40,35 @@ class RunTasks extends Command {
    *                   Check the signature for available flags
    */
 
-  async handle(args, { skipFuel, skipPassengers, captain }) {
+  async handle(args, { skipStyle, skipInstallation }) {
     // deployment task list
-
     try {
       const { createPromptModule } = await import('inquirer'); 
       const prompt = createPromptModule();
 
-      answers = await prompt([
-        {
-          type: 'input',
-          name: 'projectName',
-          message: 'Input your name prefer: '
-        },
-        {
-          type: 'list',
-          name: 'style',
-          message: 'Choice your style extension: ',
-          choices: ['scss', 'css', 'sass', 'less']
-        }
-      ])
+      const ask = skipStyle
+        ? [
+          {
+            type: 'input',
+            name: 'projectName',
+            message: 'Input your name prefer: '
+          },
+          { 
+            type: 'list',
+            name: 'style',
+            message: 'Choice your style extension: ',
+            choices: ['scss', 'css', 'sass', 'less']
+          }
+        ] : [
+          {
+            type: 'input',
+            name: 'projectName',
+            message: 'Input your name prefer: '
+          },
+          
+        ]
+
+      answers = await prompt(ask)
     } catch(err) {
       console.error(`${'\x1b[31m'}An error ocurred: `, err)
       process.exit(1);
@@ -67,12 +76,8 @@ class RunTasks extends Command {
 
     const tasks = new Listr([
       {
-        title: `Configuring ${this.chalk.bold.green(answers.projectName)} project`,
-        skip: () => {
-          // returning a truthy value for "skip" will actually skip the task
-          // a falsy value will not skip the task execution
-          return skipFuel ? 'Skip fueling.' : false
-        },
+        title: `🔨 Configuring ${this.chalk.bold.green(answers.projectName)} project`,
+        skip: () => false,
         task: () => new Listr([
           {
             title: 'Creating ...',
@@ -86,7 +91,7 @@ class RunTasks extends Command {
           },
           {
             title: 'Replace extension style',
-            skip: () => false,
+            skip: () => { return skipStyle ? false : 'Skip style extension' },
             task: () => choiceStyleExtension(answers.style, answers.projectName)
           },
           {
@@ -103,8 +108,8 @@ class RunTasks extends Command {
         
       },
       {
-        title: `Installing dependencies for the ${this.chalk.bold.green(answers.projectName)} project`,
-        skip: skipPassengers,
+        title: `📦 Installing dependencies for the ${this.chalk.bold.green(answers.projectName)} project`,
+        skip: () => skipInstallation ? false : true,
         task: () => runCommand(`cd ${answers.projectName} && npm i -f`)
       },
     ])
@@ -120,7 +125,6 @@ class RunTasks extends Command {
       ##:::: ##: ##::::::: ########::::::::::. ######:: ########:'####:
       ..:::::..::..::::::::........::::::::::::......:::........::....::
     `))   
-    // console.log(this.chalk.bold.bgBlue('Project already for use'))
   }
 
   waitASecond() {
@@ -128,4 +132,4 @@ class RunTasks extends Command {
   } 
 }
 
-module.exports = RunTasks
+module.exports = CreateMfe
