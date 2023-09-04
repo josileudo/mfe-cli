@@ -7,7 +7,7 @@ class RunSystemCommand extends Command {
    * The words flags and aliases mean the same thing in this context 😃
    */
   static get signature() {
-    return `run-command`
+    return `cli-infor`
   }
 
   /**
@@ -15,7 +15,7 @@ class RunSystemCommand extends Command {
    * about the command
    */
   static get description() {
-    return 'Run a command, like “npm test”'
+    return 'Run this command to see versions'
   }
 
   /**
@@ -32,20 +32,14 @@ class RunSystemCommand extends Command {
       console.log(`Node.js: ${this.chalk.bold.green(node.stdout)}`)
       console.log(`Mfe-cli: ${this.chalk.bold.green('15.0.0')}`)
       console.log(`Angular: ${this.chalk.bold.green('15.0.0')}`)
-      // 👇 this is the same as above, but prefer Execa() over Execa.shell()
-      // Exexa() seems to be faster and safer than Execa.shell
-      // const node = await Execa.shell('node -v')
-
-      // grab your NPM version
+      
       const npm = await Execa.shell('npm -v')
       console.log(`NPM: ${this.chalk.bold.green(npm.stdout)}`)
-
-      // you can also run your project tests, like this:
-      // await Execa('npm', ['test'])
+      
     } catch (err) {
       // catch any error and print the error message
       console.log(`❗️ Error: ${this.error(err.message)}`)
-      // exit the process to stop everything
+      
       process.exit(1)
     }
   }
