@@ -1,6 +1,6 @@
 {
   "name": "angular-mfe-cli",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "This goal of project is create a nem MFE starting using a template pre-defined",
   "main": "index.js",
   "bin": {
@@ -18,6 +18,8 @@
   "author": "josileudo_rodrigues",
   "license": "MIT",
   "dependencies": {
+    "cli-progress": "^3.12.0",
+    "figlet": "^1.6.0",
     "cli-progress": "^3.12.0",
     "figlet": "^1.6.0",
     "fs-extra": "^11.1.1",

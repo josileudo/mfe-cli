@@ -8,9 +8,27 @@ const runCommand = require('./run-command.js');
 const removeFilesRequired = require('./remove-files.js')
 const { updateNameInFiles, choiceStyleExtension} = require('./name-replaced');
 
-// const gitCheckoutCommand = `git clone --depth 1 --branch 15.0.x https://github.com/josileudo/create-mfe-app ${'repoName'}`;
 let answers;
 const gitCheckoutCommand = `git clone --depth 1 --branch 15.0.x https://github.com/josileudo/create-mfe-app`;
+
+const project_name = {
+  type: 'input',
+  name: 'projectName',
+  message: '🎤 Choose a name for your MFE: '
+}
+const style_extension = { 
+  type: 'list',
+  name: 'style',
+  message: '💄 Choice your style extension: ',
+  choices: ['scss', 'css', 'sass', 'less']
+}
+const project_version = { 
+  type: 'list',
+  name: 'version',
+  message: '🧭 Choice version for your project: ',
+  choices: ['15.0.x', '16.0.x']
+}
+
 
 class CreateMfe extends Command { 
   /**
@@ -21,6 +39,7 @@ class CreateMfe extends Command {
     return `create-mfe
     { -s, --style-choose: Choice your style extension }
     { -i, --install-packages: Install packages after create mfe project}
+    { -v, --project-version: Choice a version for your work project}
     `
   }
 
@@ -40,33 +59,16 @@ class CreateMfe extends Command {
    *                   Check the signature for available flags
    */
 
-  async handle(args, { skipStyle, skipInstallation }) {
+  async handle(args, { styleChoose, installPackages, projectVersion }) {
     // deployment task list
     try {
       const { createPromptModule } = await import('inquirer'); 
       const prompt = createPromptModule();
 
-      const ask = skipStyle
-        ? [
-          {
-            type: 'input',
-            name: 'projectName',
-            message: 'Input your name prefer: '
-          },
-          { 
-            type: 'list',
-            name: 'style',
-            message: 'Choice your style extension: ',
-            choices: ['scss', 'css', 'sass', 'less']
-          }
-        ] : [
-          {
-            type: 'input',
-            name: 'projectName',
-            message: 'Input your name prefer: '
-          },
-          
-        ]
+      const ask = [project_name]
+
+      if(styleChoose) ask.push(style_extension);
+      if(projectVersion) ask.push(project_version);
 
       answers = await prompt(ask)
     } catch(err) {
@@ -76,13 +78,13 @@ class CreateMfe extends Command {
 
     const tasks = new Listr([
       {
-        title: `🔨 Configuring ${this.chalk.bold.green(answers.projectName)} project`,
+        title: `🔨Configuring ${this.chalk.bold.green(answers.projectName)} project`,
         skip: () => false,
         task: () => new Listr([
           {
             title: 'Creating ...',
             skip: () => false, 
-            task: () => runCommand(`${gitCheckoutCommand} ${answers.projectName}`)
+            task: () => runCommand(`git clone --depth 1 --branch ${projectVersion ? answers.version : '16.0.x'} https://github.com/josileudo/create-mfe-app ${answers.projectName}`)
           },
           {
             title: 'Replace files name',
@@ -91,7 +93,7 @@ class CreateMfe extends Command {
           },
           {
             title: 'Replace extension style',
-            skip: () => { return skipStyle ? false : 'Skip style extension' },
+            skip: () => { return styleChoose ? false : 'Skip style extension' },
             task: () => choiceStyleExtension(answers.style, answers.projectName)
           },
           {
@@ -109,7 +111,7 @@ class CreateMfe extends Command {
       },
       {
         title: `📦 Installing dependencies for the ${this.chalk.bold.green(answers.projectName)} project`,
-        skip: () => skipInstallation ? false : true,
+        skip: () => installPackages ? false : true,
         task: () => runCommand(`cd ${answers.projectName} && npm i -f`)
       },
     ])

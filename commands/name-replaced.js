@@ -7,6 +7,8 @@ const files = [
   'src/app/app.module.ts',
   'package.json',
   'angular.json',
+  'bundle-mfe.js',
+  'src/index.html',
   'README.md'
 ]
 const extensions = ['scss', 'css', 'sass', 'less'];
