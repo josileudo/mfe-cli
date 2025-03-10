@@ -25,7 +25,7 @@
     "fs-extra": "^11.1.1",
     "inquirer": "^9.2.10",
     "listr": "^0.14.3",
-    "shelljs": "^0.8.5",
+    "shelljs": "^0.9.0",
     "yargs": "^17.7.2",
     "@adonisjs/ace": "~6.9.4",
     "execa": "~0.10.0"
